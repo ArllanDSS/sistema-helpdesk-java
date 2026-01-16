@@ -14,38 +14,36 @@ public class TicketService {
      * Méto.do para abrir um novo chamado.
      * Aqui é onde aplicamos as regras de negócio iniciais.
      */
-    public void abrirTicket(int id, String titulo, String descricao, Prioridade prioridade, Cliente cliente) {
+    public void abrirTicket(String titulo, String descricao, int prioridadeCod, String nomeCliente) {
+        // 1. A lógica de transformar o número (1, 2, 3) em Enum fica aqui
+        Prioridade prioridade = (prioridadeCod == 3) ? Prioridade.ALTA :
+                (prioridadeCod == 2) ? Prioridade.MEDIA : Prioridade.BAIXA;
 
-        // Validação Simples
-        if (titulo == null || titulo.trim().isEmpty()) {
-            System.err.println("Erro: Não é possível abrir um ticket sem título.");
-            return;
-        }
+        // 2. A lógica de criar o objeto Cliente fica aqui
+        // No futuro, aqui você buscaria o cliente no banco de dados pelo nome ou CPF
+        Cliente cliente = new Cliente(tickets.size() + 1, nomeCliente, nomeCliente.toLowerCase() + "@email.com");
 
-        if (cliente == null) {
-            System.err.println("Erro: Todo ticket precisa estar associado a um cliente.");
-            return;
-        }
+        // 3. Criamos o ticket
+        Ticket novoTicket = new Ticket(100 + tickets.size(), titulo, descricao, prioridade, cliente);
 
-        // Criamos o objeto Ticket
-        Ticket novoTicket = new Ticket(id, titulo, descricao, prioridade, cliente);
-
-        // Adicionamos à nossa lista (simulando o "Save" no banco)
         tickets.add(novoTicket);
-
-        System.out.println("Sucesso: Ticket #" + id + " criado para o cliente " + cliente.getNome());
+        System.out.println("Sucesso: Ticket criado para " + nomeCliente);
     }
 
-    public void atribuirTecnico(int ticketId, Tecnico tecnico) {
+    public void atribuirTecnico(int ticketId, String nomeTecnico) {
+        // 1. O Service cria o objeto (ou no futuro, buscaria no banco)
+        Tecnico tecnico = new Tecnico(1, nomeTecnico, nomeTecnico.toLowerCase() + "@suporte.com", "Geral");
+
+        // 2. Lógica de busca e atribuição
         for (Ticket t : tickets) {
             if (t.getId() == ticketId) {
                 t.setTecnicoResponsavel(tecnico);
-                t.setStatus(Status.EM_ANDAMENTO); // Regra: Se tem técnico, o status muda!
-                System.out.println("Técnico " + tecnico.getNome() + " assumiu o chamado #" + ticketId);
+                t.setStatus(Status.EM_ANDAMENTO);
+                System.out.println("O técnico " + nomeTecnico + " agora é o responsável pelo ticket #" + ticketId);
                 return;
             }
         }
-        System.err.println("Erro: Chamado #" + ticketId + " não encontrado.");
+        System.err.println("Ticket #" + ticketId + " não encontrado.");
     }
 
     public void finalizarTicket(int ticketId) {

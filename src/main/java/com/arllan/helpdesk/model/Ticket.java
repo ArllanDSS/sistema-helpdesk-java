@@ -91,4 +91,12 @@ public class Ticket {
     public void setTecnicoResponsavel(Tecnico tecnicoResponsavel) {
         this.tecnicoResponsavel = tecnicoResponsavel;
     }
+
+    @Override
+    public String toString() {
+        String responsavel = (tecnicoResponsavel != null) ? tecnicoResponsavel.getNome() : "AGUARDANDO";
+        return String.format("ID: %d | Título: %-20s | Status: %-12s | Técnico: %s",
+                id, titulo, status, responsavel);
+    }
+
 }
