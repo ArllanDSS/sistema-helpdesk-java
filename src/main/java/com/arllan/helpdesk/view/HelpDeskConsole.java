@@ -42,10 +42,33 @@ public class HelpDeskConsole {
                 String nomeCli = scanner.nextLine();
                 ticketService.abrirTicket(titulo, desc, p, nomeCli);
                 break;
-            // ... (coloque os outros cases aqui de forma organizada)
+            case 2:
+                System.out.println("\n--- ATRIBUIR TÉCNICO A CHAMADO ---");
+
+                // 1. Coleta o ID do ticket
+                System.out.print("Digite o ID do chamado: ");
+                int idAtribuir = scanner.nextInt();
+                scanner.nextLine(); // Limpeza obrigatória do buffer após ler um número!
+
+                // 2. Coleta o nome do técnico
+                System.out.print("Nome do técnico que assumirá o caso: ");
+                String nomeTecnico = scanner.nextLine();
+
+                // 3. Envia para o service
+                // O Menu não sabe nada sobre SQL ou DAOs, ele só "passa a bola"
+                ticketService.atribuirTecnico(idAtribuir, nomeTecnico);
+                break;
             case 4:
                 System.out.println("\n--- LISTAGEM ---");
                 ticketService.listarTodos().forEach(System.out::println);
+                break;
+            case 3:
+                System.out.println("\n--- FINALIZAR CHAMADO ---");
+                System.out.print("Digite o ID do chamado que deseja encerrar: ");
+                int idFinalizar = scanner.nextInt();
+                scanner.nextLine(); // Limpa o buffer
+
+                ticketService.finalizarTicket(idFinalizar);
                 break;
             case 5:
                 System.out.println("Deslogando...");

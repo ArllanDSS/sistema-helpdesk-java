@@ -1,6 +1,7 @@
 package com.arllan.helpdesk.service;
 
 import com.arllan.helpdesk.model.*;
+import com.arllan.helpdesk.repository.TicketDAO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public class TicketService {
 
     // Simulação do banco de dados em memória
-    private List<Ticket> tickets = new ArrayList<>();
+    private TicketDAO ticketDAO = new TicketDAO();
 
     /**
      * Méto.do para abrir um novo chamado.
@@ -20,52 +21,46 @@ public class TicketService {
                 (prioridadeCod == 2) ? Prioridade.MEDIA : Prioridade.BAIXA;
 
         // 2. A lógica de criar o objeto Cliente fica aqui
-        // No futuro, aqui você buscaria o cliente no banco de dados pelo nome ou CPF
-        Cliente cliente = new Cliente(tickets.size() + 1, nomeCliente, nomeCliente.toLowerCase() + "@email.com");
-
+        Cliente cliente = new Cliente(0, nomeCliente, "contato@email.com");
         // 3. Criamos o ticket
-        Ticket novoTicket = new Ticket(100 + tickets.size(), titulo, descricao, prioridade, cliente);
+        Ticket novoTicket = new Ticket(0, titulo, descricao, prioridade, cliente);
 
-        tickets.add(novoTicket);
-        System.out.println("Sucesso: Ticket criado para " + nomeCliente);
+        // 4. Salva o ticket no Banco
+        ticketDAO.salvar(novoTicket);
     }
+
 
     public void atribuirTecnico(int ticketId, String nomeTecnico) {
-        // 1. O Service cria o objeto (ou no futuro, buscaria no banco)
-        Tecnico tecnico = new Tecnico(1, nomeTecnico, nomeTecnico.toLowerCase() + "@suporte.com", "Geral");
+        // Regra de negócio: Quando um técnico assume, o status passa a ser EM_ANDAMENTO
+        String statusAndamento = Status.EM_ANDAMENTO.name();
 
-        // 2. Lógica de busca e atribuição
-        for (Ticket t : tickets) {
-            if (t.getId() == ticketId) {
-                t.setTecnicoResponsavel(tecnico);
-                t.setStatus(Status.EM_ANDAMENTO);
-                System.out.println("O técnico " + nomeTecnico + " agora é o responsável pelo ticket #" + ticketId);
-                return;
-            }
-        }
-        System.err.println("Ticket #" + ticketId + " não encontrado.");
+        // Chamamos o DAO para persistir a alteração
+        ticketDAO.atualizarTecnico(ticketId, nomeTecnico, statusAndamento);
     }
-
     public void finalizarTicket(int ticketId) {
+        // 1. Primeiro, precisamos verificar se o ticket existe e se tem técnico
+        // Buscamos a lista atualizada do banco
+        List<Ticket> tickets = ticketDAO.buscarTodos();
+
         for (Ticket t : tickets) {
             if (t.getId() == ticketId) {
-
-                // Regra de Negócio: O chamado só pode ser finalizado se tiver um técnico
-                if (t.getTecnicoResponsavel() == null) {
-                    System.err.println("Erro: Não é possível finalizar o chamado #" + ticketId + " sem um técnico atribuído.");
+                // Regra de Ouro: Sem técnico, não finaliza!
+                if (t.getTecnicoResponsavel() == null || t.getTecnicoResponsavel().getNome().isEmpty()) {
+                    System.err.println("ERRO: O ticket #" + ticketId + " não pode ser finalizado sem um técnico atribuído.");
                     return;
                 }
 
-                t.setStatus(Status.CONCLUIDO);
-                System.out.println("Sucesso: Chamado #" + ticketId + " foi FINALIZADO com sucesso.");
+                // 2. Se estiver tudo OK, mandamos o DAO atualizar
+                ticketDAO.atualizarStatus(ticketId, Status.CONCLUIDO.name());
                 return;
             }
         }
-        System.err.println("Erro: Chamado #" + ticketId + " não encontrado para finalização.");
+        System.err.println("ERRO: Ticket #" + ticketId + " não encontrado.");
     }
 
     // Método para listar todos os tickets
     public List<Ticket> listarTodos() {
-        return this.tickets;
+        // Agora buscamos direto da fonte real
+        return ticketDAO.buscarTodos();
     }
 }
