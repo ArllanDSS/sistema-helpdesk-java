@@ -45,10 +45,12 @@ public class TicketDAO {
                 int id = rs.getInt("id");
                 String titulo = rs.getString("titulo");
                 String descricao = rs.getString("descricao");
+                String statusTexto = rs.getString("status");
+                String prioridadeTexto = rs.getString("prioridade");
 
                 // 2. Convertemos as Strings de volta para Enums
-                Prioridade prioridade = Prioridade.valueOf(rs.getString("prioridade"));
-                Status status = Status.valueOf(rs.getString("status"));
+                Prioridade prioridade = Prioridade.valueOf(prioridadeTexto);
+                Status status = Status.valueOf(statusTexto);
 
                 // 3. Criamos o Cliente (mesmo que simplificado)
                 String nomeCliente = rs.getString("nome_cliente");

@@ -1,30 +1,31 @@
-# Sistema de Help Desk - Java Core
+# HelpDesk System - Gerenciamento de Chamados (CLI)
 
-Este projeto é um sistema de gerenciamento de chamados técnicos desenvolvido para consolidar conhecimentos em **Orientação a Objetos** com Java.
+Este é um sistema de Help Desk desenvolvido em Java para gerenciar tickets de suporte técnico. O projeto foi construído focando em fundamentos sólidos de Orientação a Objetos, Arquitetura em Camadas e Persistência de Dados.
 
-## Tecnologias Utilizadas
-- Java 17+
-- Maven
-- Git
+## 🛠️ Tecnologias e Ferramentas
+- **Linguagem:** Java 17+
+- **Gerenciador de Dependências:** Maven
+- **Banco de Dados:** PostgreSQL
+- **Persistência:** JDBC (Java Database Connectivity)
+- **Versionamento:** Git
 
-## Conceitos de OO Aplicados
-- **Herança e Abstração:** Classes de usuários (`Cliente` e `Tecnico`) herdando de uma classe abstrata `Usuario`.
-- **Encapsulamento:** Uso de modificadores de acesso e métodos Getters/Setters.
-- **Enums:** Padronização de Status e Prioridade.
-- **Composição:** O objeto `Ticket` que integra Clientes e Técnicos.
-- **Camada de Service:** Separação da lógica de negócio da interface principal.
+## 🏛️ Arquitetura e Padrões de Projeto
+O projeto segue o padrão de **Arquitetura em Camadas**, garantindo a separação de responsabilidades:
+- **Model:** Entidades puras do negócio (Ticket, Usuário, Cliente, Técnico).
+- **Repository (DAO):** Camada de persistência isolada com o padrão Data Access Object.
+- **Service:** Centralização das regras de negócio e validações.
+- **View:** Interface de linha de comando (CLI) para interação com o usuário.
 
-## Atualização: Refatoração e Arquitetura (Fase 1.1)
-Nesta etapa, apliquei princípios de **Clean Code** e **Separação de Responsabilidades**:
-- **Desacoplamento:** Removi a criação de objetos (`Cliente`, `Tecnico`) da classe `Main`. Agora, a interface apenas coleta dados e a camada de `Service` gerencia a lógica de construção.
-- **Sobrescrita de Métodos:** Implementei o método `toString()` na classe `Ticket` para padronizar a exibição dos dados no console, simplificando a camada de visualização.
-- **Baixo Acoplamento:** O Menu não precisa conhecer as regras de criação das entidades, facilitando manutenções futuras.
+## 🚀 Funcionalidades Principais
+- **Abertura de Tickets:** Registro de problemas com título, descrição e níveis de prioridade.
+- **Atribuição de Técnico:** Fluxo de trabalho para vincular um técnico responsável a um chamado.
+- **Ciclo de Vida do Ticket:** Gerenciamento de estados (Aberto, Em Andamento, Concluído).
+- **Segurança de Dados:** Implementação de carregamento de credenciais via arquivos `.properties` e proteção via `.gitignore`.
+- **Persistência Real:** Armazenamento robusto em banco de dados relacional com PreparedStatement (proteção contra SQL Injection).
 
-## Evolução da Arquitetura: Camada de View e SRP (Fase 1.2)
-
-Nesta atualização, o projeto deixou de ser um script linear para seguir uma arquitetura modularizada, focada no **Princípio da Responsabilidade Única (SRP)**:
-
-- **Criação da Camada de View:** Toda a lógica de interação com o usuário (Scanner, menus e loops) foi movida para a classe `HelpDeskConsole` dentro do pacote `view`.
-- **Main Minimalista:** A classe `Main` agora atua apenas como o ponto de entrada (entry point), sendo responsável exclusivamente por inicializar a aplicação.
-- **Desacoplamento de Interface:** Esta estrutura permite que a interface de usuário (CLI) seja substituída no futuro por uma API REST ou interface gráfica (GUI) sem a necessidade de alterar as regras de negócio ou a classe principal.
-- **Organização de Fluxo:** Implementação de métodos privados para processamento de opções, tornando o código mais legível e fácil de testar.
+## 🔧 Como Executar
+1. Clone o repositório.
+2. Certifique-se de ter o PostgreSQL instalado e uma base de dados criada.
+3. Configure o arquivo `src/main/resources/config.properties` baseando-se no modelo `config.properties.example`.
+4. Execute o Maven para baixar as dependências: `mvn install`.
+5. Inicie a aplicação através da classe `Main`.
